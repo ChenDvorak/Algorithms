@@ -1,14 +1,12 @@
 ﻿/*
- * 使用深度优先搜索探索迷宫
- * 由于是使用穷举，每种分支都会走一遍，会导致搜索时间特别长
- * 所以想这种迷宫的地图搜索，不要使用，效率是十分低下且不稳定的。
- * 会根据地图的复杂度而得出不同的时间。
+ * 使用广度优先搜索探索迷宫
+ * 
  */
 
 using System;
 using System.Collections.Generic;
 
-namespace Algorithms.DeepFirstSearch
+namespace Algorithms.BreadthFilstSearch
 {
     /// <summary>
     /// 走迷宫
@@ -22,11 +20,16 @@ namespace Algorithms.DeepFirstSearch
         {
             public int X { get; set; }
             public int Y { get; set; }
-            public Coordinate(int x, int y)
+            public Coordinate(int x, int y, Coordinate[] path)
             {
                 X = x;
                 Y = y;
+                Path = new List<Coordinate>(path.Length + 1);
+                Path.AddRange(path);
+                Path.Add(new Coordinate(x, y, Array.Empty<Coordinate>()));
             }
+
+            public List<Coordinate> Path { get; set; }
 
             public override string ToString()
             {
@@ -52,22 +55,22 @@ namespace Algorithms.DeepFirstSearch
             /// 往左走，获取下一个坐标
             /// </summary>
             /// <returns>新坐标</returns>
-            internal Coordinate MoveLeft() => new Coordinate(X - 1, Y);
+            internal Coordinate MoveLeft() => new Coordinate(X - 1, Y, Path.ToArray());
             /// <summary>
             /// 往右走，获取下一个坐标
             /// </summary>
             /// <returns>新坐标</returns>
-            internal Coordinate MoveRight() => new Coordinate(X + 1, Y);
+            internal Coordinate MoveRight() => new Coordinate(X + 1, Y, Path.ToArray());
             /// <summary>
             /// 往上走，获取下一个坐标
             /// </summary>
             /// <returns>新坐标</returns>
-            internal Coordinate MoveUp() => new Coordinate(X, Y - 1);
+            internal Coordinate MoveUp() => new Coordinate(X, Y - 1, Path.ToArray());
             /// <summary>
             /// 往下走，获取下一个坐标
             /// </summary>
             /// <returns>新坐标</returns>
-            internal Coordinate MoveDown() => new Coordinate(X, Y + 1);
+            internal Coordinate MoveDown() => new Coordinate(X, Y + 1, Path.ToArray());
         }
 
         /// <summary>
@@ -90,6 +93,7 @@ namespace Algorithms.DeepFirstSearch
         /// 目标坐标
         /// </summary>
         public readonly Coordinate Target_Coordinate;
+        private Queue<Coordinate> Que;
         /// <summary>
         /// 行数
         /// </summary>
@@ -106,10 +110,6 @@ namespace Algorithms.DeepFirstSearch
         /// 最短路径
         /// </summary>
         private Coordinate[] Path { get; set; }
-        /// <summary>
-        /// 临时路径
-        /// </summary>
-        private Stack<Coordinate> TemplatePath { get; set; }
         /// <summary>
         /// 最小步数
         /// </summary>
@@ -129,9 +129,8 @@ namespace Algorithms.DeepFirstSearch
             MinimumStep = Rows * Columns;
 
             int capacity = MinimumStep / 2;
+            Que = new Queue<Coordinate>(capacity);
             Book = new HashSet<Coordinate>(capacity);
-
-            TemplatePath = new Stack<Coordinate>(capacity);
         }
         /// <summary>
         /// 新建一个迷宫
@@ -171,42 +170,13 @@ namespace Algorithms.DeepFirstSearch
                 if (step < MinimumStep)
                 {
                     MinimumStep = step;
-                    //  更新最小路径记录
-                    Path = new Coordinate[TemplatePath.Count];
-                    TemplatePath.CopyTo(Path, 0);
+
                     return true;
                 }
                 return false;
             }
 
-            bool isFindMinimumPath = false;
-
-            //  往四个方向探索
-            for (int i = 0; i < 4; i++)
-            {
-                Coordinate nextCoordinate = i switch
-                {
-                    0 => currentCoordinate.MoveUp(),
-                    1 => currentCoordinate.MoveRight(),
-                    2 => currentCoordinate.MoveDown(),
-                    3 => currentCoordinate.MoveLeft(),
-                    _ => throw new ArgumentOutOfRangeException(),
-                };
-
-                if (Book.Contains(nextCoordinate) || map[nextCoordinate.X][nextCoordinate.Y] == BARRIER
-                || nextCoordinate.X < 0 || nextCoordinate.X > Rows
-                || nextCoordinate.Y < 0 || nextCoordinate.Y > Columns)
-                    continue;
-
-                TemplatePath.Push(nextCoordinate);
-                Book.Add(nextCoordinate);
-                isFindMinimumPath = SearchMinimumPath(nextCoordinate, step + 1);
-                //  记录找到的最小路径
-
-                TemplatePath.Pop();
-                Book.Remove(nextCoordinate);
-            }
-            return isFindMinimumPath;
+            
         }
     }
 }
