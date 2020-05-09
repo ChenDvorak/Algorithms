@@ -20,17 +20,27 @@ namespace Algorithms.BreadthFilstSearch
         {
             public int X { get; set; }
             public int Y { get; set; }
+            public Coordinate(int x, int y)
+            {
+                X = x;
+                Y = y;
+                Path = new List<Coordinate>(0);
+                Step = 0;
+            }
             public Coordinate(int x, int y, Coordinate[] path)
             {
                 X = x;
                 Y = y;
-                Path = new List<Coordinate>(path.Length + 1);
+                Path = new List<Coordinate>(path.Length);
                 Path.AddRange(path);
-                Path.Add(new Coordinate(x, y, Array.Empty<Coordinate>()));
+                Step = path.Length;
             }
 
+            /// <summary>
+            /// 经过的路径，不包括自己
+            /// </summary>
             public List<Coordinate> Path { get; set; }
-
+            public int Step { get; internal set; }
             public override string ToString()
             {
                 return $"{{{X},{Y}}}";
@@ -55,22 +65,50 @@ namespace Algorithms.BreadthFilstSearch
             /// 往左走，获取下一个坐标
             /// </summary>
             /// <returns>新坐标</returns>
-            internal Coordinate MoveLeft() => new Coordinate(X - 1, Y, Path.ToArray());
+            internal Coordinate MoveLeft()
+            {
+                Coordinate[] parents = new Coordinate[Path.Count + 1];
+                Path.CopyTo(parents);
+                parents[^1] = new Coordinate(X, Y);
+                return new Coordinate(X - 1, Y, parents);
+            }
+
             /// <summary>
             /// 往右走，获取下一个坐标
             /// </summary>
             /// <returns>新坐标</returns>
-            internal Coordinate MoveRight() => new Coordinate(X + 1, Y, Path.ToArray());
+            internal Coordinate MoveRight()
+            {
+                Coordinate[] parents = new Coordinate[Path.Count + 1];
+                Path.CopyTo(parents);
+                parents[^1] = new Coordinate(X, Y);
+
+                return new Coordinate(X + 1, Y, parents);
+            }
+
             /// <summary>
             /// 往上走，获取下一个坐标
             /// </summary>
             /// <returns>新坐标</returns>
-            internal Coordinate MoveUp() => new Coordinate(X, Y - 1, Path.ToArray());
+            internal Coordinate MoveUp()
+            {
+                Coordinate[] parents = new Coordinate[Path.Count + 1];
+                Path.CopyTo(parents);
+                parents[^1] = new Coordinate(X, Y);
+                return new Coordinate(X, Y - 1, parents);
+            }
+
             /// <summary>
             /// 往下走，获取下一个坐标
             /// </summary>
             /// <returns>新坐标</returns>
-            internal Coordinate MoveDown() => new Coordinate(X, Y + 1, Path.ToArray());
+            internal Coordinate MoveDown()
+            {
+                Coordinate[] parents = new Coordinate[Path.Count + 1];
+                Path.CopyTo(parents);
+                parents[^1] = new Coordinate(X, Y);
+                return new Coordinate(X, Y + 1, parents);
+            }
         }
 
         /// <summary>
@@ -93,7 +131,10 @@ namespace Algorithms.BreadthFilstSearch
         /// 目标坐标
         /// </summary>
         public readonly Coordinate Target_Coordinate;
-        private Queue<Coordinate> Que;
+        /// <summary>
+        /// 等待队列
+        /// </summary>
+        private Queue<Coordinate> Waiter;
         /// <summary>
         /// 行数
         /// </summary>
@@ -109,11 +150,11 @@ namespace Algorithms.BreadthFilstSearch
         /// <summary>
         /// 最短路径
         /// </summary>
-        private Coordinate[] Path { get; set; }
+        private Coordinate Path { get; set; }
         /// <summary>
-        /// 最小步数
+        /// 是否能达到目的
         /// </summary>
-        private int MinimumStep;
+        private bool IsFinded = false;
 
         private Labyrinth(char[][] map, Coordinate startCoordinate, Coordinate targetCoordinate)
         {
@@ -126,10 +167,14 @@ namespace Algorithms.BreadthFilstSearch
 
             Rows = map.Length;
             Columns = map[0].Length;
-            MinimumStep = Rows * Columns;
 
-            int capacity = MinimumStep / 2;
-            Que = new Queue<Coordinate>(capacity);
+            Path = new Coordinate(0, 0)
+            { 
+                Step = Rows * Columns
+            };
+            int capacity = Rows * Columns / 2;
+
+            Waiter = new Queue<Coordinate>(capacity);
             Book = new HashSet<Coordinate>(capacity);
         }
         /// <summary>
@@ -148,12 +193,11 @@ namespace Algorithms.BreadthFilstSearch
         /// 搜索路径
         /// </summary>
         /// <returns>(是否可以达到目的, 达到目的最小路径)</returns>
-        public (bool, Coordinate[]) Search()
+        public (bool, Coordinate) Search()
         {
-            SearchMinimumPath(Start_Coordinate, 0);
-            if (MinimumStep < 0)
-                return (false, Array.Empty<Coordinate>());
-            return (true, Path);
+            Waiter.Enqueue(Start_Coordinate);
+            SearchMinimumPath();
+            return (IsFinded, Path);
         }
 
         /// <summary>
@@ -162,21 +206,45 @@ namespace Algorithms.BreadthFilstSearch
         /// <param name="currentCoordinate">当前坐标</param>
         /// <param name="step">已经走了几步</param>
         /// <returns>是否有找到最小路径</returns>
-        private bool SearchMinimumPath(Coordinate currentCoordinate, int step)
+        private void SearchMinimumPath()
         {
+            if (Waiter.Count == 0)
+                return;
+            var currentCoordinate = Waiter.Dequeue();
+            Book.Add(currentCoordinate);
+
             if (currentCoordinate.Equals(Target_Coordinate))
             {
                 //  更新最小路径记录
-                if (step < MinimumStep)
+                if (currentCoordinate.Step < Path.Step)
                 {
-                    MinimumStep = step;
-
-                    return true;
+                    IsFinded = true;
+                    Path = currentCoordinate;
+                    return;
                 }
-                return false;
+                return;
             }
 
-            
+            for (int i = 0; i < 4; i++)
+            {
+                Coordinate nextCoordinate = i switch
+                { 
+                    0 => currentCoordinate.MoveUp(),
+                    1 => currentCoordinate.MoveRight(),
+                    2 => currentCoordinate.MoveDown(),
+                    3 => currentCoordinate.MoveLeft(),
+                    _ => throw new ArgumentException()
+                };
+
+                if (Book.Contains(nextCoordinate) || map[nextCoordinate.X][nextCoordinate.Y] == BARRIER
+                || nextCoordinate.X < 0 || nextCoordinate.X > Rows
+                || nextCoordinate.Y < 0 || nextCoordinate.Y > Columns)
+                    continue;
+
+                Waiter.Enqueue(nextCoordinate);
+            }
+
+            SearchMinimumPath();
         }
     }
 }
