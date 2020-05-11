@@ -16,7 +16,7 @@ namespace AlgorithmsTest
         [TestMethod]
         public void TestLabyrinth()
         {
-            //  这个地图要跑 5 秒
+            //  这个地图使用深度优先搜索效率慢到无法接受
             char[][] map = new char[][] {
                 new char[] {'#', '#', '#', '#', '#', '#', '#', '#' },
                 new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
@@ -24,14 +24,24 @@ namespace AlgorithmsTest
                 new char[] {'#', '.', '#', '.', '.', '.', '.', '#' },
                 new char[] {'#', '.', '.', '.', '.', '#', '.', '#' },
                 new char[] {'#', '.', '.', '#', '#', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '#', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
                 new char[] {'#', '.', '.', '#', '.', '#', '.', '#' },
+                new char[] {'#', '.', '.', '#', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '#', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '#', '.', '.', '.', '#' },
                 new char[] {'#', '.', '.', '.', '.', '#', '.', '#' },
                 new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
                 new char[] {'#', '#', '#', '#', '#', '#', '#', '#' },
             };
 
             var startCoordinate = new Labyrinth.Coordinate(1, 1);
-            var endCoordinate = new Labyrinth.Coordinate(7, 6);
+            var endCoordinate = new Labyrinth.Coordinate(17, 6);
 
             var labyrinth = Labyrinth.New(map, startCoordinate, endCoordinate);
             //  即使只是 8 * 9 的地图，搜索的效率也十分低下

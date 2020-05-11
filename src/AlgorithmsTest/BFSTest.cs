@@ -24,14 +24,24 @@ namespace AlgorithmsTest
                 new char[] {'#', '.', '#', '.', '.', '.', '.', '#' },
                 new char[] {'#', '.', '.', '.', '.', '#', '.', '#' },
                 new char[] {'#', '.', '.', '#', '#', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '#', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
                 new char[] {'#', '.', '.', '#', '.', '#', '.', '#' },
+                new char[] {'#', '.', '.', '#', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '#', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
+                new char[] {'#', '.', '.', '#', '.', '.', '.', '#' },
                 new char[] {'#', '.', '.', '.', '.', '#', '.', '#' },
                 new char[] {'#', '.', '.', '.', '.', '.', '.', '#' },
                 new char[] {'#', '#', '#', '#', '#', '#', '#', '#' },
             };
 
             var startCoordinate = new Labyrinth.Coordinate(1, 1);
-            var endCoordinate = new Labyrinth.Coordinate(7, 6);
+            var endCoordinate = new Labyrinth.Coordinate(17, 6);
 
             var labyrinth = Labyrinth.New(map, startCoordinate, endCoordinate);
             
