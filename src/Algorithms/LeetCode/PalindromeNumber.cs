@@ -17,7 +17,7 @@ namespace Algorithms.LeetCode
             int palindromeNumber = 0;
             while (palindromeNumber < value)
             {
-                palindromeNumber * 10 + value % 10;
+                palindromeNumber = palindromeNumber * 10 + value % 10;
                 value /= 10;
             }
             return palindromeNumber == value || palindromeNumber / 10 == value;

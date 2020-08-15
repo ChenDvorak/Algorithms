@@ -7,9 +7,10 @@ namespace AlgorithmsTest.LeetCode
     [TestClass]
     public class PalindromeNumber
     {
+        [TestMethod]
         public void TestPalindromeNumber()
         {
-            var f = new LeetCode.PalindromeNumber();
+            var f = new Algorithms.LeetCode.PalindromeNumber();
             f.Run(123456);
         }
     }

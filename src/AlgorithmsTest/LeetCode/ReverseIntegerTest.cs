@@ -7,9 +7,10 @@ namespace AlgorithmsTest.LeetCode
     [TestClass]
     public class ReverseIntegerTest
     {
+        [TestMethod]
         public void TestReverseInteger()
         {
-            var f = new LeetCode.ReverseInteger();
+            var f = new Algorithms.LeetCode.ReverseInteger();
             var reverseValue = f.Run(-123456);
             Console.WriteLine($"Reverse Value is: {reverseValue}");
         }
