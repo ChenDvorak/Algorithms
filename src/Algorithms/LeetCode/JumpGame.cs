@@ -21,6 +21,14 @@ namespace Algorithms.LeetCode
             return Dfs(nums, 0);
         }
 
+        /// <summary>
+        /// 深度优先搜索算法
+        /// 时间 O(n)
+        /// 空间 O(n)
+        /// </summary>
+        /// <param name="nums"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         private bool Dfs(int[] nums, int index)
         {
             if (index == nums.Length - 1)
@@ -35,6 +43,28 @@ namespace Algorithms.LeetCode
                 if (Dfs(nums, index + i))
                     return true;
                 flags[i] = false;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 贪心算法
+        /// 时间 O(n)
+        /// 空间 O(1)
+        /// </summary>
+        /// <param name="nums"></param>
+        /// <returns></returns>
+        public bool Run2(int[] nums)
+        {
+            int n = nums.Length;
+            int rightMost = 0;
+            for (int i = 0; i < n; i++)
+            {
+                if (i > rightMost) 
+                    return false;
+                rightMost = Math.Max(rightMost, i + nums[i]);
+                if (rightMost >= n - 1)
+                    return true;
             }
             return false;
         }
