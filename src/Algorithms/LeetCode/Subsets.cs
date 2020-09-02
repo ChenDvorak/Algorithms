@@ -23,10 +23,8 @@ namespace Algorithms.LeetCode
             answers.Add(path.ToList());
             for (int i = index; i < nums.Length; i++)
             {
-                if (path.Contains(nums[i]))
-                    return;
                 path.Push(nums[i]);
-                Backtrack(index + 1, path, nums);
+                Backtrack(i + 1, path, nums);
                 path.Pop();
             }
         }
